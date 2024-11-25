@@ -1,0 +1,42 @@
+import RPi.GPIO as GPIO
+import time 
+import picamera 
+import os
+
+# Pin to which the motion sensor is connected
+SENSOR_PIN = 23
+
+# Folder to save pictures
+SAVE_FOLDER = "/home/pi/motion_pics"
+
+# Create the folder if it doesn't exist
+if not os path.exists (SAVE_FOLDER):
+o5. makedirs (SAVE_FOLDER)
+
+# Initialize the camera
+camera = picamera.PICamera)
+
+# Set up GPIO mode
+GPIO. setmode (GPIO.BCM)
+GPIO.setup(SENSOR_PIN, GPIO.IN)
+
+# Callback function to take a picture when motion is detected
+def my_callback (channel):
+timestamp = time.strftime ("%Y%m%d-%H%M%5")
+picture_filename = 05-path-join(SAVE_FOLDER,
+f"motion_{timestamp}-jpg")
+camera. capture(picture_filename)
+
+# Capture and save the picture
+print(f'Motion detected! Picture saved: {picture_filename}')
+
+try:
+# Detect motion and trigger the callback
+GPIO. add_event_detect (SENSOR_PIN, GPIO.RISING, callback=my_callback)
+# Keep the program running
+while True:
+time.sleep(100)
+except KeyboardInterrupt:
+print("Exiting program...")
+finally:
+GPIO.cleanup) # Clean up GPIO resources when done
