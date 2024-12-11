@@ -114,7 +114,9 @@ import subprocess
 SENSOR_PIN = 17
 
 GPIO.setwarnings(False)
+
 GPIO.setmode(GPIO.BCM)
+
 GPIO.setup(SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
 SAVE_FOLDER = "/home/Shaheryar/motion_pics/"
