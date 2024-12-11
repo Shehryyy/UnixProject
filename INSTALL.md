@@ -64,13 +64,13 @@ Making sure the camera is properly connected:
 
 -	Turn on the raspberry pi
 -	Connect the raspberry pi model to the laptop using usb-c to usb-c cable.
--	Open terminal and type “ssh <username>@<ip address of the raspberry pi>
+-	Open terminal and type “ssh 'username'@'raspberryPi ip-address'"
 -	Update the system by typing the following in the terminal:
 "sudo apt update"
 "sudo apt upgrade -y"
 -	Open the Raspberry Pi configuration tool by typing: 
-"sudo raspi-config"  
-Then go to Interface Options -> I2C and enable it.
+"sudo raspi-config"
+- Then go to Interface Options -> I2C and enable it.
 -	Reboot the raspberry pi by typing: 
 "sudo reboot"
 -	Use RealVNC Viewer to see the Raspberry pi OS visually
@@ -106,53 +106,57 @@ Creating a new file to include the script:
 -	Include the following code:
 
 
-import RPi.GPIO as GPIO
-import time
-import os
-import subprocess
+        import RPi.GPIO as GPIO
 
-SENSOR_PIN = 17
+        import time
 
-GPIO.setwarnings(False)
+        import os
 
-GPIO.setmode(GPIO.BCM)
+        import subprocess
 
-GPIO.setup(SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        SENSOR_PIN = 17
 
-SAVE_FOLDER = "/home/Shaheryar/motion_pics/"
+        GPIO.setwarnings(False)
 
-if not os.path.exists(SAVE_FOLDER):
-    os.makedirs(SAVE_FOLDER)
+        GPIO.setmode(GPIO.BCM)
 
-def motion_detected():
-    timestamp = time.strftime("%Y%m%d-%H%M%S")
-    picture_filename = os.path.join(SAVE_FOLDER, f"motion_{timestamp}.jpeg")
-    command = f"libcamera-jpeg -o {picture_filename}.jpeg"
+        GPIO.setup(SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-    try:
-        subprocess.run(command, shell=True, check=True)
-        print(f"Picture saved as {picture_filename}")
-    except subprocess.CalledProcessError as e:
-        print(f"Error while taking picture: {e}")
+        SAVE_FOLDER = "/home/<RaspberryPi Username>/motion_pics/"
 
-try:
-    print("Looking for motion. Press Ctrl+C to exit.")
-    while True:
-        if GPIO.input(SENSOR_PIN): 
-            print("Motion Detected! Taking picture...")
-            motion_detected()
-            time.sleep(2) 
+        if not os.path.exists(SAVE_FOLDER):
+
+            os.makedirs(SAVE_FOLDER)
+
+        def motion_detected():
+            timestamp = time.strftime("%Y%m%d-%H%M%S")
+            picture_filename = os.path.join(SAVE_FOLDER, f"motion_{timestamp}.jpeg")
+            command = f"libcamera-jpeg -o {picture_filename}.jpeg"
+
+        try:
+            subprocess.run(command, shell=True, check=True)
+            print(f"Picture saved as {picture_filename}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error while taking picture: {e}")
+
+        try:
+            print("Looking for motion. Press Ctrl+C to exit.")
+        while True:
+            if GPIO.input(SENSOR_PIN): 
+                print("Motion Detected! Taking picture...")
+                motion_detected()
+                time.sleep(2) 
         else:
             print("No motion detected")
             time.sleep(2)
         
         time.sleep(0.5)  
 
-except KeyboardInterrupt:
-    print("\nExiting program...")
+        except KeyboardInterrupt:
+            print("\nExiting program...")
 
-finally:
-    GPIO.cleanup()  
+        finally:
+            GPIO.cleanup()  
 
  
 -	Run the script to make sure it works by typing:
